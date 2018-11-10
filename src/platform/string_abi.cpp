@@ -94,235 +94,237 @@ namespace xlang::impl
     }
 }
 
-using namespace xlang;
 using namespace xlang::impl;
 
-XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_create_string_reference_utf8(
-    xlang_char8 const* source_string,
-    uint32_t length,
-    xlang_string_header* header,
-    xlang_string* string
-) XLANG_NOEXCEPT
-try
+namespace xlang
 {
-    *string = xlang::impl::create_string_reference(source_string, length, header);
-    return nullptr;
-}
-catch(...)
-{
-    *string = nullptr;
-    return xlang::to_result();
-}
-
-XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_create_string_reference_utf16(
-    char16_t const* source_string,
-    uint32_t length,
-    xlang_string_header* header,
-    xlang_string* string
-) XLANG_NOEXCEPT
-try
-{
-    *string = xlang::impl::create_string_reference(source_string, length, header);
-    return nullptr;
-}
-catch (...)
-{
-    *string = nullptr;
-    return xlang::to_result();
-}
-
-XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_create_string_utf8(
-    xlang_char8 const* source_string,
-    uint32_t length,
-    xlang_string* string
-) XLANG_NOEXCEPT
-try
-{
-    *string = xlang::impl::create_string(source_string, length);
-    return nullptr;
-}
-catch (...)
-{
-    *string = nullptr;
-    return xlang::to_result();
-}
-
-XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_create_string_utf16(
-    char16_t const* source_string,
-    uint32_t length,
-    xlang_string* string
-) XLANG_NOEXCEPT
-try
-{
-    *string = xlang::impl::create_string(source_string, length);
-    return nullptr;
-}
-catch (...)
-{
-    *string = nullptr;
-    return xlang::to_result();
-}
-
-XLANG_PAL_EXPORT void XLANG_CALL xlang_delete_string(xlang_string string) XLANG_NOEXCEPT
-{
-    string_base* str = from_handle(string);
-    if (str)
+    XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_create_string_reference_utf8(
+        xlang_char8 const* source_string,
+        uint32_t length,
+        xlang_string_header* header,
+        xlang_string* string
+    ) noexcept
+        try
     {
-        str->release_base();
+        *string = xlang::impl::create_string_reference(source_string, length, header);
+        return nullptr;
     }
-}
-
-XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_delete_string_buffer(xlang_string_buffer buffer_handle) XLANG_NOEXCEPT
-try
-{
-    if (!buffer_handle)
+    catch (...)
     {
-        xlang::throw_result(xlang_error_pointer);
+        *string = nullptr;
+        return xlang::to_result();
     }
 
-    from_handle(buffer_handle)->free_preallocated();
-    return nullptr;
-}
-catch (...)
-{
-    return xlang::to_result();
-}
-
-XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_duplicate_string(
-    xlang_string string,
-    xlang_string* newString
-) XLANG_NOEXCEPT
-try
-{
-    *newString = nullptr;
-
-    if (string)
+    XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_create_string_reference_utf16(
+        char16_t const* source_string,
+        uint32_t length,
+        xlang_string_header* header,
+        xlang_string* string
+    ) noexcept
+        try
     {
-        *newString = to_handle(from_handle(string)->duplicate_base());
+        *string = xlang::impl::create_string_reference(source_string, length, header);
+        return nullptr;
     }
-    return nullptr;
-}
-catch (...)
-{
-    return xlang::to_result();
-}
-
-XLANG_PAL_EXPORT xlang_string_encoding XLANG_CALL xlang_get_string_encoding(
-    xlang_string string
-) XLANG_NOEXCEPT
-{
-    if (string)
+    catch (...)
     {
-        bool const is_utf8 = from_handle(string)->is_utf8();
-        if (from_handle(string)->has_alternate())
+        *string = nullptr;
+        return xlang::to_result();
+    }
+
+    XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_create_string_utf8(
+        xlang_char8 const* source_string,
+        uint32_t length,
+        xlang_string* string
+    ) noexcept
+        try
+    {
+        *string = xlang::impl::create_string(source_string, length);
+        return nullptr;
+    }
+    catch (...)
+    {
+        *string = nullptr;
+        return xlang::to_result();
+    }
+
+    XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_create_string_utf16(
+        char16_t const* source_string,
+        uint32_t length,
+        xlang_string* string
+    ) noexcept
+        try
+    {
+        *string = xlang::impl::create_string(source_string, length);
+        return nullptr;
+    }
+    catch (...)
+    {
+        *string = nullptr;
+        return xlang::to_result();
+    }
+
+    XLANG_PAL_EXPORT void XLANG_CALL xlang_delete_string(xlang_string string) noexcept
+    {
+        string_base* str = from_handle(string);
+        if (str)
         {
-            return static_cast<xlang_string_encoding>(xlang_string_encoding::utf8 | xlang_string_encoding::utf16);
-        }
-        else
-        {
-            return is_utf8 ? xlang_string_encoding::utf8 : xlang_string_encoding::utf16;
+            str->release_base();
         }
     }
-    else
+
+    XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_delete_string_buffer(xlang_string_buffer buffer_handle) noexcept
+        try
     {
-        return static_cast<xlang_string_encoding>(xlang_string_encoding::utf8 | xlang_string_encoding::utf16);
-    }
-}
-
-XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_get_string_raw_buffer_utf8(
-    xlang_string string,
-    xlang_char8 const* * buffer,
-    uint32_t* length
-) XLANG_NOEXCEPT
-try
-{
-
-    *length = xlang::impl::xlang_get_string_raw_buffer(string, buffer);
-    return nullptr;
-}
-catch (...)
-{
-    *buffer = nullptr;
-    *length = 0;
-    return xlang::to_result();
-}
-
-XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_get_string_raw_buffer_utf16(
-    xlang_string string,
-    char16_t const* * buffer,
-    uint32_t* length
-) XLANG_NOEXCEPT
-try
-{
-    *length = xlang::impl::xlang_get_string_raw_buffer(string, buffer);
-    return nullptr;
-}
-catch (...)
-{
-    *buffer = nullptr;
-    *length = 0;
-    return xlang::to_result();
-}
-
-XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_preallocate_string_buffer_utf8(
-    uint32_t length,
-    xlang_char8** char_buffer,
-    xlang_string_buffer* buffer_handle
-) XLANG_NOEXCEPT
-try
-{
-    *buffer_handle = xlang::impl::preallocate_string_buffer(length, char_buffer);
-    return nullptr;
-}
-catch (...)
-{
-    *char_buffer = nullptr;
-    *buffer_handle = nullptr;
-    return xlang::to_result();
-}
-
-
-XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_preallocate_string_buffer_utf16(
-    uint32_t length,
-    char16_t** char_buffer,
-    xlang_string_buffer* buffer_handle
-) XLANG_NOEXCEPT
-try
-{
-    *buffer_handle = xlang::impl::preallocate_string_buffer(length, char_buffer);
-    return nullptr;
-}
-catch (...)
-{
-    *char_buffer = nullptr;
-    *buffer_handle = nullptr;
-    return xlang::to_result();
-}
-
-XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_promote_string_buffer(
-    xlang_string_buffer buffer_handle,
-    xlang_string* string,
-    uint32_t length
-) XLANG_NOEXCEPT
-try
-{
-    *string = nullptr;
-
-    if (buffer_handle)
-    {
-        *string = to_handle(from_handle(buffer_handle)->promote_preallocated(length));
-    }
-    else
-    {
-        if (length != 0)
+        if (!buffer_handle)
         {
             xlang::throw_result(xlang_error_pointer);
         }
+
+        from_handle(buffer_handle)->free_preallocated();
+        return nullptr;
+    }
+    catch (...)
+    {
+        return xlang::to_result();
     }
 
-    return nullptr;
-}
-catch (...)
-{
-    return xlang::to_result();
+    XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_duplicate_string(
+        xlang_string string,
+        xlang_string* newString
+    ) noexcept
+        try
+    {
+        *newString = nullptr;
+
+        if (string)
+        {
+            *newString = to_handle(from_handle(string)->duplicate_base());
+        }
+        return nullptr;
+    }
+    catch (...)
+    {
+        return xlang::to_result();
+    }
+
+    XLANG_PAL_EXPORT xlang_string_encoding XLANG_CALL xlang_get_string_encoding(
+        xlang_string string
+    ) noexcept
+    {
+        if (string)
+        {
+            bool const is_utf8 = from_handle(string)->is_utf8();
+            if (from_handle(string)->has_alternate())
+            {
+                return static_cast<xlang_string_encoding>(xlang_string_encoding::utf8 | xlang_string_encoding::utf16);
+            }
+            else
+            {
+                return is_utf8 ? xlang_string_encoding::utf8 : xlang_string_encoding::utf16;
+            }
+        }
+        else
+        {
+            return static_cast<xlang_string_encoding>(xlang_string_encoding::utf8 | xlang_string_encoding::utf16);
+        }
+    }
+
+    XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_get_string_raw_buffer_utf8(
+        xlang_string string,
+        xlang_char8 const* * buffer,
+        uint32_t* length
+    ) noexcept
+        try
+    {
+
+        *length = xlang::impl::xlang_get_string_raw_buffer(string, buffer);
+        return nullptr;
+    }
+    catch (...)
+    {
+        *buffer = nullptr;
+        *length = 0;
+        return xlang::to_result();
+    }
+
+    XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_get_string_raw_buffer_utf16(
+        xlang_string string,
+        char16_t const* * buffer,
+        uint32_t* length
+    ) noexcept
+        try
+    {
+        *length = xlang::impl::xlang_get_string_raw_buffer(string, buffer);
+        return nullptr;
+    }
+    catch (...)
+    {
+        *buffer = nullptr;
+        *length = 0;
+        return xlang::to_result();
+    }
+
+    XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_preallocate_string_buffer_utf8(
+        uint32_t length,
+        xlang_char8** char_buffer,
+        xlang_string_buffer* buffer_handle
+    ) noexcept
+        try
+    {
+        *buffer_handle = xlang::impl::preallocate_string_buffer(length, char_buffer);
+        return nullptr;
+    }
+    catch (...)
+    {
+        *char_buffer = nullptr;
+        *buffer_handle = nullptr;
+        return xlang::to_result();
+    }
+
+
+    XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_preallocate_string_buffer_utf16(
+        uint32_t length,
+        char16_t** char_buffer,
+        xlang_string_buffer* buffer_handle
+    ) noexcept
+        try
+    {
+        *buffer_handle = xlang::impl::preallocate_string_buffer(length, char_buffer);
+        return nullptr;
+    }
+    catch (...)
+    {
+        *char_buffer = nullptr;
+        *buffer_handle = nullptr;
+        return xlang::to_result();
+    }
+
+    XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_promote_string_buffer(
+        xlang_string_buffer buffer_handle,
+        xlang_string* string,
+        uint32_t length
+    ) noexcept
+        try
+    {
+        *string = nullptr;
+
+        if (buffer_handle)
+        {
+            *string = to_handle(from_handle(buffer_handle)->promote_preallocated(length));
+        }
+        else
+        {
+            if (length != 0)
+            {
+                xlang::throw_result(xlang_error_pointer);
+            }
+        }
+
+        return nullptr;
+    }
+    catch (...)
+    {
+        return xlang::to_result();
+    }
 }

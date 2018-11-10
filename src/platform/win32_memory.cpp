@@ -5,14 +5,14 @@
 #error "This file is only for targeting Windows"
 #endif
 
-extern "C"
+namespace xlang
 {
-    void* XLANG_CALL xlang_mem_alloc(size_t count) XLANG_NOEXCEPT
+    void* XLANG_CALL xlang_mem_alloc(size_t count) noexcept
     {
         return ::CoTaskMemAlloc(count);
     }
 
-    void XLANG_CALL xlang_mem_free(void* ptr) XLANG_NOEXCEPT
+    void XLANG_CALL xlang_mem_free(void* ptr) noexcept
     {
         return ::CoTaskMemFree(ptr);
     }

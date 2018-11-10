@@ -13,7 +13,7 @@ namespace xlang
                 : m_result(result)
             {}
 
-            int32_t XLANG_CALL QueryInterface(xlang_guid const& id, void** object) noexcept override
+            int32_t XLANG_CALL QueryInterface(guid const& id, void** object) noexcept override
             {
                 if (id == xlang_unknown_guid)
                 {

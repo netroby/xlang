@@ -5,7 +5,7 @@
 #error "This file is for targeting platforms other than Windows"
 #endif
 
-extern "C"
+namespace xlang
 {
     void* XLANG_CALL xlang_mem_alloc(size_t count) noexcept
     {

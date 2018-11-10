@@ -1,14 +1,8 @@
 #pragma once
 
-#ifndef XLANG_PAL_H
-#define XLANG_PAL_H
-
 #include <stddef.h>
 #include <stdint.h>
-
-#ifdef __cplusplus
 #include <type_traits>
-#endif
 
 #ifdef _WIN32
 #define XLANG_PLATFORM_WINDOWS 1
@@ -51,20 +45,13 @@
 # endif
 #endif
 
-#ifdef __cplusplus
-# define XLANG_NOEXCEPT noexcept
-# if XLANG_COMPILER_MSVC
-#  define XLANG_EBO __declspec(empty_bases)
-#  define XLANG_NOVTABLE __declspec(novtable)
-# else
-#  define XLANG_EBO
-#  define XLANG_NOVTABLE
-# endif
+#if XLANG_COMPILER_MSVC
+# define XLANG_EBO __declspec(empty_bases)
+# define XLANG_NOVTABLE __declspec(novtable)
 #else
-# define XLANG_NOEXCEPT
 # define XLANG_EBO
 # define XLANG_NOVTABLE
-#endif
+# endif
 
 #ifndef XLANG_PAL_HAS_CHAR8_T
 # ifdef __cpp_char8_t
@@ -80,14 +67,12 @@
 #define XLANG_PAL_CHAR8_T char
 #endif
 
-#ifdef __cplusplus
-extern "C"
+namespace xlang
 {
-#endif
     // Type/handle definitions
     typedef uint32_t xlang_result;
 
-    struct xlang_guid
+    struct guid
     {
         uint32_t Data1;
         uint16_t Data2;
@@ -97,19 +82,19 @@ extern "C"
 
     struct XLANG_NOVTABLE xlang_unknown
     {
-        virtual int32_t XLANG_CALL QueryInterface(xlang_guid const& id, void** object) XLANG_NOEXCEPT = 0;
-        virtual uint32_t XLANG_CALL AddRef() XLANG_NOEXCEPT = 0;
-        virtual uint32_t XLANG_CALL Release() XLANG_NOEXCEPT = 0;
+        virtual int32_t XLANG_CALL QueryInterface(guid const& id, void** object) noexcept = 0;
+        virtual uint32_t XLANG_CALL AddRef() noexcept = 0;
+        virtual uint32_t XLANG_CALL Release() noexcept = 0;
     };
 
-    inline constexpr xlang_guid xlang_unknown_guid{ 0x00000000,0x0000,0x0000,{ 0xC0,0x00,0x00,0x00,0x00,0x00,0x00,0x46 } };
+    inline constexpr guid xlang_unknown_guid{ 0x00000000,0x0000,0x0000,{ 0xC0,0x00,0x00,0x00,0x00,0x00,0x00,0x46 } };
 
     struct XLANG_NOVTABLE xlang_error_info : xlang_unknown
     {
-        virtual xlang_result error_code() XLANG_NOEXCEPT = 0;
+        virtual xlang_result error_code() noexcept = 0;
     };
 
-    inline constexpr xlang_guid xlang_error_info_guid{ 0x9e89b87e, 0xb6fc, 0x491b, { 0xba, 0x2b, 0x71, 0xa, 0x1b, 0x46, 0x7a, 0xe3 } };
+    inline constexpr guid xlang_error_info_guid{ 0x9e89b87e, 0xb6fc, 0x491b, { 0xba, 0x2b, 0x71, 0xa, 0x1b, 0x46, 0x7a, 0xe3 } };
 
     typedef XLANG_PAL_CHAR8_T xlang_char8;
 
@@ -131,7 +116,6 @@ extern "C"
         char reserved2[16];
     };
 
-#ifdef __cplusplus
     enum class xlang_string_encoding
     {
         none = 0x0,
@@ -139,133 +123,115 @@ extern "C"
         utf16 = 0x2
     };
 
-#else
-    enum xlang_string_encoding
-    {
-        XlangStringEncodingNone = 0x0,
-        XlangStringEncodingUtf8 = 0x1,
-        XlangStringEncodingUtf16 = 0x2
-    };
-#endif
-
     // Function declarations
-    XLANG_PAL_EXPORT void* XLANG_CALL xlang_mem_alloc(size_t count) XLANG_NOEXCEPT;
+    XLANG_PAL_EXPORT void* XLANG_CALL xlang_mem_alloc(size_t count) noexcept;
 
-    XLANG_PAL_EXPORT void XLANG_CALL xlang_mem_free(void* ptr) XLANG_NOEXCEPT;
+    XLANG_PAL_EXPORT void XLANG_CALL xlang_mem_free(void* ptr) noexcept;
 
     XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_create_string_utf8(
         xlang_char8 const* source_string,
         uint32_t length,
         xlang_string* string
-    ) XLANG_NOEXCEPT;
+    ) noexcept;
     XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_create_string_utf16(
         char16_t const* source_string,
         uint32_t length,
         xlang_string* string
-    ) XLANG_NOEXCEPT;
+    ) noexcept;
 
     XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_create_string_reference_utf8(
         xlang_char8 const* source_string,
         uint32_t length,
         xlang_string_header* header,
         xlang_string* string
-    ) XLANG_NOEXCEPT;
+    ) noexcept;
     XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_create_string_reference_utf16(
         char16_t const* source_string,
         uint32_t length,
         xlang_string_header* header,
         xlang_string* string
-    ) XLANG_NOEXCEPT;
+    ) noexcept;
 
-    XLANG_PAL_EXPORT void XLANG_CALL xlang_delete_string(xlang_string string) XLANG_NOEXCEPT;
+    XLANG_PAL_EXPORT void XLANG_CALL xlang_delete_string(xlang_string string) noexcept;
 
-    XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_delete_string_buffer(xlang_string_buffer buffer_handle) XLANG_NOEXCEPT;
+    XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_delete_string_buffer(xlang_string_buffer buffer_handle) noexcept;
 
     XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_duplicate_string(
         xlang_string string,
         xlang_string* newString
-    ) XLANG_NOEXCEPT;
+    ) noexcept;
 
     XLANG_PAL_EXPORT xlang_string_encoding XLANG_CALL xlang_get_string_encoding(
         xlang_string string
-    ) XLANG_NOEXCEPT;
+    ) noexcept;
 
     XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_get_string_raw_buffer_utf8(
         xlang_string string,
         xlang_char8 const* * buffer,
         uint32_t* length
-    ) XLANG_NOEXCEPT;
+    ) noexcept;
     XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_get_string_raw_buffer_utf16(
         xlang_string string,
         char16_t const* * buffer,
         uint32_t* length
-    ) XLANG_NOEXCEPT;
+    ) noexcept;
 
     XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_preallocate_string_buffer_utf8(
         uint32_t length,
         xlang_char8** char_buffer,
         xlang_string_buffer* buffer_handle
-    ) XLANG_NOEXCEPT;
+    ) noexcept;
     XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_preallocate_string_buffer_utf16(
         uint32_t length,
         char16_t** char_buffer,
         xlang_string_buffer* buffer_handle
-    ) XLANG_NOEXCEPT;
+    ) noexcept;
 
     XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_promote_string_buffer(
         xlang_string_buffer buffer_handle,
         xlang_string* string,
         uint32_t length
-    ) XLANG_NOEXCEPT;
+    ) noexcept;
 
     XLANG_PAL_EXPORT xlang_error_info* XLANG_CALL xlang_get_activation_factory(
         xlang_string class_name,
-        xlang_guid const& iid,
+        guid const& iid,
         void** factory
-    ) XLANG_NOEXCEPT;
+    ) noexcept;
 
-    typedef xlang_error_info*(XLANG_CALL * xlang_pfn_lib_get_activation_factory)(xlang_string, xlang_guid const&, void **);
+    typedef xlang_error_info*(XLANG_CALL * xlang_pfn_lib_get_activation_factory)(xlang_string, guid const&, void **) noexcept;
 
+    constexpr xlang_string_encoding operator|(xlang_string_encoding lhs, xlang_string_encoding rhs) noexcept
+    {
+        using int_t = std::underlying_type_t<xlang_string_encoding>;
+        return static_cast<xlang_string_encoding>(static_cast<int_t>(lhs) | static_cast<int_t>(rhs));
+    }
 
-#ifdef __cplusplus
+    constexpr xlang_string_encoding operator&(xlang_string_encoding lhs, xlang_string_encoding rhs) noexcept
+    {
+        using int_t = std::underlying_type_t<xlang_string_encoding>;
+        return static_cast<xlang_string_encoding>(static_cast<int_t>(lhs) & static_cast<int_t>(rhs));
+    }
+
+    constexpr xlang_string_encoding& operator|=(xlang_string_encoding& lhs, xlang_string_encoding rhs) noexcept
+    {
+        lhs = lhs | rhs;
+        return lhs;
+    }
+
+    constexpr xlang_string_encoding& operator&=(xlang_string_encoding& lhs, xlang_string_encoding rhs) noexcept
+    {
+        lhs = lhs & rhs;
+        return lhs;
+    }
+
+    inline constexpr xlang_result xlang_error_ok{ 0 };
+    inline constexpr xlang_result xlang_error_mem_invalid_size{ 0x80080011 };
+    inline constexpr xlang_result xlang_error_string_not_null_terminated{ 0x80000017 };
+    inline constexpr xlang_result xlang_error_pointer{ 0x80004003 };
+    inline constexpr xlang_result xlang_error_sadness{ 0x80004005 };
+    inline constexpr xlang_result xlang_error_out_of_memory{ 0x8007000e };
+    inline constexpr xlang_result xlang_error_invalid_arg{ 0x80070057 };
+    inline constexpr xlang_result xlang_error_untranslatable_string{ 0x80070459 };
+    inline constexpr xlang_result xlang_error_class_not_available{ 0x80040111 };
 }
-#endif
-
-#ifdef __cplusplus
-
-constexpr xlang_string_encoding operator|(xlang_string_encoding lhs, xlang_string_encoding rhs) noexcept
-{
-    using int_t = std::underlying_type_t<xlang_string_encoding>;
-    return static_cast<xlang_string_encoding>(static_cast<int_t>(lhs) | static_cast<int_t>(rhs));
-}
-
-constexpr xlang_string_encoding operator&(xlang_string_encoding lhs, xlang_string_encoding rhs) noexcept
-{
-    using int_t = std::underlying_type_t<xlang_string_encoding>;
-    return static_cast<xlang_string_encoding>(static_cast<int_t>(lhs) & static_cast<int_t>(rhs));
-}
-
-constexpr xlang_string_encoding& operator|=(xlang_string_encoding& lhs, xlang_string_encoding rhs) noexcept
-{
-    lhs = lhs | rhs;
-    return lhs;
-}
-
-constexpr xlang_string_encoding& operator&=(xlang_string_encoding& lhs, xlang_string_encoding rhs) noexcept
-{
-    lhs = lhs & rhs;
-    return lhs;
-}
-
-inline constexpr xlang_result xlang_error_ok{ 0 };
-inline constexpr xlang_result xlang_error_mem_invalid_size{ 0x80080011 };
-inline constexpr xlang_result xlang_error_string_not_null_terminated{ 0x80000017 };
-inline constexpr xlang_result xlang_error_pointer{ 0x80004003 };
-inline constexpr xlang_result xlang_error_sadness{ 0x80004005 };
-inline constexpr xlang_result xlang_error_out_of_memory{ 0x8007000e };
-inline constexpr xlang_result xlang_error_invalid_arg{ 0x80070057 };
-inline constexpr xlang_result xlang_error_untranslatable_string{ 0x80070459 };
-inline constexpr xlang_result xlang_error_class_not_available{ 0x80040111 };
-#endif
-
-#endif

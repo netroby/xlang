@@ -18,4 +18,8 @@ add_library(pal SHARED ${sources})
 target_include_directories(pal PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(pal PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/published)
 
+message(STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
+set(CMAKE_INSTALL_MESSAGE ALWAYS)
+message(STATUS "CMAKE_INSTALL_MESSAGE=${CMAKE_INSTALL_MESSAGE}")
+
 install(TARGETS pal DESTINATION "test_platform")
